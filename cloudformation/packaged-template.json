@@ -1,0 +1,389 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: A template that will launch a Puppet Enterprise Master with PAYG Licence
+  --AWSMP::e1952c00-f3ce-4f62-8188-78eb2e9d5272::d9ab58d6-8d07-4355-a800-482da1da5a61
+Mappings:
+  RegionMap:
+    ap-northeast-1:
+      AMI: ami-ca465cb6
+    ap-northeast-2:
+      AMI: ami-6057f90e
+    ap-south-1:
+      AMI: ami-45adfd29
+    ap-southeast-1:
+      AMI: ami-dd89aba1
+    ap-southeast-2:
+      AMI: ami-7b448f19
+    ca-central-1:
+      AMI: ami-1e8b0a7a
+    eu-central-1:
+      AMI: ami-a660444d
+    eu-west-1:
+      AMI: ami-3089a949
+    eu-west-2:
+      AMI: ami-38eb085f
+    sa-east-1:
+      AMI: ami-45adfd29
+    us-east-1:
+      AMI: ami-66c76919
+    us-east-2:
+      AMI: ami-b1bf8cd4
+    us-west-1:
+      AMI: ami-0e5a476e
+    us-west-2:
+      AMI: ami-bad3bcc2
+Outputs:
+  AZ:
+    Description: Availability Zone of the newly created EC2 instance
+    Value:
+      Fn::GetAtt:
+      - PuppetMaster
+      - AvailabilityZone
+  InstanceId:
+    Description: InstanceId of the newly created EC2 instance
+    Value:
+      Ref: PuppetMaster
+  PrivateDNS:
+    Description: Private DNSName of the newly created EC2 instance
+    Value:
+      Fn::GetAtt:
+      - PuppetMaster
+      - PrivateDnsName
+  PrivateIP:
+    Description: Private IP address of the newly created EC2 instance
+    Value:
+      Fn::GetAtt:
+      - PuppetMaster
+      - PrivateIp
+  PublicDNS:
+    Description: Public DNSName of the newly created EC2 instance
+    Value:
+      Fn::GetAtt:
+      - PuppetMaster
+      - PublicDnsName
+  PublicIP:
+    Description: Public IP address of the newly created EC2 instance
+    Value:
+      Fn::GetAtt:
+      - PuppetMaster
+      - PublicIp
+  PuppetMasterDnsName:
+    Description: Public DNS Name for the Puppet Server
+    Value:
+      Fn::GetAtt:
+      - PuppetMaster
+      - PublicDnsName
+  SubnetId:
+    Description: Subnet ID for the public subnet
+    Value:
+      Ref: PublicSubnet
+  VPC:
+    Description: VPC ID
+    Value:
+      Ref: VPC
+Parameters:
+  HostedZoneName:
+    Description: The Hosted Zone for the instance
+    Type: String
+  InstanceType:
+    AllowedValues:
+    - t2.large
+    - t2.xlarge
+    - t2.2xlarge
+    - m3.large
+    - m3.xlarge
+    - m3.2xlarge
+    - m4.large
+    - m4.xlarge
+    - m4.2xlarge
+    - m4.4xlarge
+    - m4.10xlarge
+    - m4.16xlarge
+    - cc1.4xlarge
+    - cc2.8xlarge
+    - c3.xlarge
+    - c3.2xlarge
+    - c3.4xlarge
+    - c3.8xlarge
+    - c4.xlarge
+    - c4.2xlarge
+    - c4.4xlarge
+    - c4.8xlarge
+    - f1.2xlarge
+    - f1.16xlarge
+    - g2.2xlarge
+    - g2.8xlarge
+    - p2.xlarge
+    - p2.8xlarge
+    - p2.16xlarge
+    - cg1.4xlarge
+    - cr1.8xlarge
+    - r3.large
+    - r3.xlarge
+    - r3.2xlarge
+    - r3.4xlarge
+    - r3.8xlarge
+    - r4.large
+    - r4.xlarge
+    - r4.2xlarge
+    - r4.4xlarge
+    - r4.8xlarge
+    - r4.16xlarge
+    - x1.16xlarge
+    - x1.32xlarge
+    - i2.xlarge
+    - i2.2xlarge
+    - i2.4xlarge
+    - i2.8xlarge
+    - i3.large
+    - i3.xlarge
+    - i3.2xlarge
+    - i3.4xlarge
+    - i3.8xlarge
+    - i3.16xlarge
+    - hi1.4xlarge
+    - hs1.8xlarge
+    - d2.xlarge
+    - d2.2xlarge
+    - d2.4xlarge
+    - d2.8xlarge
+    ConstraintDescription: must be a valid instance size for running Puppet Enterprise
+    Default: m4.xlarge
+    Description: Master EC2 instance type
+    Type: String
+  KeyPairName:
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+  MasterHostName:
+    Default: PuppetMaster
+    Description: The name of the Master instance
+    Type: String
+  PuppetMasterDNSName:
+    Description: The DNS name for the Master instance
+    Type: String
+  PuppetMasterIP:
+    Default: ''
+    Description: IP for the Puppet Master
+    Type: String
+  RemoteAdminCIDR:
+    AllowedPattern: ^$|[a-zA-Z0-9]+\..+
+    Description: CIDR block or IP for SSH access
+    Type: String
+  SubnetCIDR:
+    AllowedPattern: '[a-zA-Z0-9]+\..+'
+    Description: CIDR block for the public subnet
+    Type: String
+  VPCCIDR:
+    AllowedPattern: '[a-zA-Z0-9]+\..+'
+    Description: CIDR block for the VPC
+    Type: String
+Resources:
+  AttachGateway:
+    Properties:
+      InternetGatewayId:
+        Ref: InternetGateway
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::VPCGatewayAttachment
+  HostedZone:
+    Properties:
+      HostedZoneConfig:
+        Comment: This is the PE Master HostedZoneConfiguration
+      Name:
+        Ref: HostedZoneName
+      VPCs:
+      - VPCId:
+          Ref: VPC
+        VPCRegion:
+          Ref: AWS::Region
+    Type: AWS::Route53::HostedZone
+  InternetGateway:
+    Properties:
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackName
+      - Key: Network
+        Value: Public
+    Type: AWS::EC2::InternetGateway
+  MeteringRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AWSMarketplaceMeteringFullAccess
+    Type: AWS::IAM::Role
+  PEMasterInstanceProfile:
+    Properties:
+      Path: /
+      Roles:
+      - Ref: MeteringRole
+    Type: AWS::IAM::InstanceProfile
+  PublicRoute:
+    Properties:
+      DestinationCidrBlock:
+        Ref: RemoteAdminCIDR
+      GatewayId:
+        Ref: InternetGateway
+      RouteTableId:
+        Ref: PublicRouteTable
+    Type: AWS::EC2::Route
+  PublicRouteTable:
+    Properties:
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackName
+      - Key: Network
+        Value: Public Subnet
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::RouteTable
+  PublicSubnet:
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+        - 1
+        - Fn::GetAZs: ''
+      CidrBlock:
+        Ref: SubnetCIDR
+      MapPublicIpOnLaunch: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackName
+      - Key: Network
+        Value: Public
+      - Key: Role
+        Value: Public Subnet
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::Subnet
+  PublicSubnetRouteTableAssociation:
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      SubnetId:
+        Ref: PublicSubnet
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  PuppetMaster:
+    Properties:
+      IamInstanceProfile:
+        Ref: PEMasterInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+        - RegionMap
+        - Ref: AWS::Region
+        - AMI
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyPairName
+      NetworkInterfaces:
+      - DeleteOnTermination: 'true'
+        DeviceIndex: 0
+        GroupSet:
+        - Ref: PuppetMasterSecurityGroup
+        PrivateIpAddresses:
+        - Primary: 'true'
+          PrivateIpAddress:
+            Ref: PuppetMasterIP
+        SubnetId:
+          Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value:
+          Ref: MasterHostName
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - ''
+          - - '#!/bin/bash -x'
+            - '
+
+              '
+            - /opt/puppetlabs/aws/bin/check_status.sh --wait
+            - '
+
+              '
+    Type: AWS::EC2::Instance
+  PuppetMasterDNSRecord:
+    DependsOn: HostedZone
+    Properties:
+      HostedZoneId:
+        Fn::Join:
+        - ''
+        - - /hostedzone/
+          - Ref: HostedZone
+      Name:
+        Fn::Join:
+        - ''
+        - - Ref: PuppetMasterDNSName
+          - .
+          - Ref: HostedZoneName
+      ResourceRecords:
+      - Ref: PuppetMasterIP
+      TTL: '900'
+      Type: A
+    Type: AWS::Route53::RecordSet
+  PuppetMasterSecurityGroup:
+    Properties:
+      GroupDescription: Enables access to the Puppet Master
+      SecurityGroupIngress:
+      - CidrIp:
+          Ref: RemoteAdminCIDR
+        FromPort: '22'
+        IpProtocol: tcp
+        ToPort: '22'
+      - CidrIp:
+          Ref: VPCCIDR
+        FromPort: '22'
+        IpProtocol: tcp
+        ToPort: '22'
+      - CidrIp:
+          Ref: VPCCIDR
+        FromPort: '8140'
+        IpProtocol: tcp
+        ToPort: '8140'
+      - CidrIp:
+          Ref: VPCCIDR
+        FromPort: '8142'
+        IpProtocol: tcp
+        ToPort: '8142'
+      - CidrIp:
+          Ref: VPCCIDR
+        FromPort: '61613'
+        IpProtocol: tcp
+        ToPort: '61613'
+      - CidrIp:
+          Ref: RemoteAdminCIDR
+        FromPort: '443'
+        IpProtocol: tcp
+        ToPort: '443'
+      - CidrIp:
+          Ref: VPCCIDR
+        FromPort: '80'
+        IpProtocol: tcp
+        ToPort: '80'
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::SecurityGroup
+  VPC:
+    Properties:
+      CidrBlock:
+        Ref: VPCCIDR
+      EnableDnsHostnames: 'true'
+      EnableDnsSupport: 'true'
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackName
+      - Key: Network
+        Value: VPN Connected VPC
+    Type: AWS::EC2::VPC
