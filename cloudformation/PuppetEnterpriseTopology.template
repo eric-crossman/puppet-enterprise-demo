@@ -1,5 +1,5 @@
 {
-    "AWSTemplateFormatVersion": "2017.3.5 PAYG",
+    "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "A template that will launch a Puppet Enterprise Master with PAYG Licence --AWSMP::e1952c00-f3ce-4f62-8188-78eb2e9d5272::d9ab58d6-8d07-4355-a800-482da1da5a61",
     "Mappings": {
         "RegionMap": {
