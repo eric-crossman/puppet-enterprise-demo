@@ -8,7 +8,7 @@ resource "random_id" "randomId" {
 }
 
 resource "azurerm_storage_account" "diagstorageaccount" {
-  name = "diag${$random_id.randomId.hex}"
+  name = "diag${random_id.randomId.hex}"
   resource_group_name = "${azurerm_resource_group.puppetdemo.name}"
   location = "eastus"
   account_replication_type = "LRS"
