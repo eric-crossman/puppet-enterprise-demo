@@ -28,3 +28,45 @@ resource "azurerm_public_ip" "PuppetMasterPublicIP" {
     ProjectId = "PuppetEnterpriseDemo"
   }
 }
+
+resource "azurerm_network_security_group" "puppetmasternsg" {
+  name = "PuppetMasterNSG"
+  location = "eastus"
+  resource_group_name = "${azurerm_resource_group.puppetdemo.name}"
+
+  security_rule {
+    name = "SSH_From_UF"
+    priority = 1001
+    direction = "Inbound"
+    access = "Allow"
+    protocol = "Tcp"
+    source_port_range = "*"
+    destination_port_range = "22"
+    source_address_prefix = "128.227.0.0/16"
+    destination_address_prefix = "*"
+  }
+
+  tags = {
+    environment = "demo"
+    ProjectId = "PuppetEnterpriseDemo"
+  }
+}
+
+resource "azurerm_network_interface" "puppetmasternic" {
+  name = "PuppetMasterNIC"
+  location = "eastus"
+  resource_group_name = "${azurerm_resource_group.puppetdemo.name}"
+  network_security_group_id = "${azurerm_network_security_group.puppetmasternsg.id}"
+
+  ip_configuration {
+    name = "PuppetMasterNicConfig"
+    subnet_id = "${azurerm_subnet.puppetsubnet.id}"
+    private_ip_address_allocation = "dynamic"
+    public_ip_address_id = "${azurerm_public_ip.PuppetMasterPublicIP.id}"
+  }
+
+  tags {
+    environment = "demo"
+    ProjectId = "PuppetEnterpriseDemo"
+  }
+}
