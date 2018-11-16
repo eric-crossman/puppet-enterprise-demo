@@ -226,6 +226,7 @@ Resources:
       - Ref: MeteringRole
     Type: AWS::IAM::InstanceProfile
   PublicRoute:
+    DependsOn: AttachGateway
     Properties:
       DestinationCidrBlock:
         Ref: RemoteAdminCIDR
