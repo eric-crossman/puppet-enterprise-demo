@@ -28,8 +28,7 @@ resource "azurerm_virtual_machine" "puppetmastervm" {
     disable_password_authentication = true
     ssh_keys = {
       path = "/home/azureuser/.ssh/authorized_keys"
-      key_data = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzWGZW7RfyRPR5Xb8bJv9Xpl1YCxMjQFhLBKzLVr0n+3A6+YC51dxM8mhiGn8x+h4sIdIEIt+ilU3iLJgoe+QFtf1x8fes68OWm8PMI7BcAJ3keiH65X6S+DCWGB3ZL2kr4BSZ54jReAQxk7vqTOI3t+ehltun1kKW83ZpDQe3i2soLpD/5eY3G2IVjHnDBT7y/pqY7wM7mpNGL44GtVzu4/hmDF6Fp0p438fJ1FmaZy8w+GV3z+Rdxl0V8hqNJy/VZ+flPABFoEg3JogL0FMXh32FANfxND7Os5azYx43R6XW1Sghcuigyia3tzv5RCog9CZu+uS34V7WqA5Yoj7b ecrossman@IT-ICT-041M
-"
+      key_data = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzWGZW7RfyRPR5Xb8bJv9Xpl1YCxMjQFhLBKzLVr0n+3A6+YC51dxM8mhiGn8x+h4sIdIEIt+ilU3iLJgoe+QFtf1x8fes68OWm8PMI7BcAJ3keiH65X6S+DCWGB3ZL2kr4BSZ54jReAQxk7vqTOI3t+ehltun1kKW83ZpDQe3i2soLpD/5eY3G2IVjHnDBT7y/pqY7wM7mpNGL44GtVzu4/hmDF6Fp0p438fJ1FmaZy8w+GV3z+Rdxl0V8hqNJy/VZ+flPABFoEg3JogL0FMXh32FANfxND7Os5azYx43R6XW1Sghcuigyia3tzv5RCog9CZu+uS34V7WqA5Yoj7b"
     }
   }
 
