@@ -48,7 +48,7 @@ resource "azurerm_virtual_machine" "mediawikivm" {
   name = "MediaWiki01VM"
   location = "eastus"
   resource_group_name = "${azurerm_resource_group.puppetdemo.name}"
-  network_interface_ids = ["${azurerm_network_interface.puppetmasternic.id}"]
+  network_interface_ids = ["${azurerm_network_interface.mediawiki01nic.id}"]
   vm_size = "Standard_B1s"
 
   storage_os_disk {
