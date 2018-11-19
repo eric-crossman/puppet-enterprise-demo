@@ -19,6 +19,7 @@ resource "azurerm_subnet" "puppetsubnet" {
 
 resource "azurerm_public_ip" "PuppetMasterPublicIP" {
   name = "PuppetMasterPublicIP"
+  domain_name_label = "ercpuppet"
   location = "eastus"
   resource_group_name = "${azurerm_resource_group.puppetdemo.name}"
   public_ip_address_allocation = "dynamic"
