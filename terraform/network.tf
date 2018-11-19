@@ -46,6 +46,18 @@ resource "azurerm_network_security_group" "puppetmasternsg" {
     destination_address_prefix = "*"
   }
 
+  security_rule {
+    name = "Console_HTTPS_From_UF"
+    priority = 1011
+    direction = "Inbound"
+    access = "Allow"
+    protocol = "Tcp"
+    source_port_range = "*"
+    destination_port_range = "443"
+    source_address_prefix = "128.227.0.0/16"
+    destination_address_prefix = "*"
+  }
+
   tags = {
     environment = "demo"
     ProjectId = "PuppetEnterpriseDemo"
