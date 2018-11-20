@@ -6,6 +6,5 @@
 Import-Module AzureRM
 
 # Stop all VMs in resource group
-Stop-AzureRmVM -Name MediaWiki01VM -ResourceGroupName puppetdemo
-Stop-AzureRmVM -Name PuppetMasterVM -ResourceGroupName puppetdemo
- 
+Stop-AzureRmVM -Force -Name MediaWiki01VM -ResourceGroupName puppetdemo
+Stop-AzureRmVM -Force -Name PuppetMasterVM -ResourceGroupName puppetdemo
